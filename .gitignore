@@ -81,5 +81,6 @@ Debug/*
 /.vscode/ipch/
 *.launch
 /stm32f0_custom_bootloader/Debug/*
+/stm32f0_dummy_app/Debug/*
 
 

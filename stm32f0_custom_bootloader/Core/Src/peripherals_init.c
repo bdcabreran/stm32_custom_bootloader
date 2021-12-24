@@ -4,20 +4,21 @@
 /* Private function prototypes -----------------------------------------------*/
 static void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+extern void Error_Handler(void);
 
 /*UART driver */
 uart_driver_t uart1 = {.handle.Instance = USART1};
 uart_driver_t uart2 = {.handle.Instance = USART2};
 
 /*UART1 Buffer size */
-#define UART1_RX_DATA_BUFF_SIZE       (100)
-#define UART1_TX_DATA_BUFF_SIZE       (100)
+#define UART1_RX_DATA_BUFF_SIZE       (256)
+#define UART1_TX_DATA_BUFF_SIZE       (256)
 uint8_t uart1_tx_buff[UART1_TX_DATA_BUFF_SIZE];
 uint8_t uart1_rx_buff[UART1_RX_DATA_BUFF_SIZE];
 
 /*UART2 Buffer size */
-#define UART2_RX_DATA_BUFF_SIZE       (100)
-#define UART2_TX_DATA_BUFF_SIZE       (100)
+#define UART2_RX_DATA_BUFF_SIZE       (256)
+#define UART2_TX_DATA_BUFF_SIZE       (256)
 uint8_t uart2_tx_buff[UART2_TX_DATA_BUFF_SIZE];
 uint8_t uart2_rx_buff[UART2_TX_DATA_BUFF_SIZE];
 
