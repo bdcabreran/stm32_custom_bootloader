@@ -1,4 +1,3 @@
-/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file           : main.h
@@ -17,7 +16,6 @@
   *
   ******************************************************************************
   */
-/* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __MAIN_H
@@ -31,44 +29,14 @@ extern "C" {
 #include "stm32f0xx_hal.h"
 
 /* Private includes ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */
-
-/* USER CODE END Includes */
-
 /* Exported types ------------------------------------------------------------*/
-/* USER CODE BEGIN ET */
-
-/* USER CODE END ET */
-
 /* Exported constants --------------------------------------------------------*/
-/* USER CODE BEGIN EC */
-
-/* USER CODE END EC */
-
 /* Exported macro ------------------------------------------------------------*/
-/* USER CODE BEGIN EM */
-
-/* USER CODE END EM */
-
 /* Exported functions prototypes ---------------------------------------------*/
+
+
 void Error_Handler(void);
 
-/* USER CODE BEGIN EFP */
-
-/* USER CODE END EFP */
-
-/* Private defines -----------------------------------------------------------*/
-#define LED1_Pin GPIO_PIN_15
-#define LED1_GPIO_Port GPIOA
-#define LED2_Pin GPIO_PIN_3
-#define LED2_GPIO_Port GPIOB
-#define LED3_Pin GPIO_PIN_4
-#define LED3_GPIO_Port GPIOB
-#define USER_BTN_Pin GPIO_PIN_9
-#define USER_BTN_GPIO_Port GPIOB
-/* USER CODE BEGIN Private defines */
-
-/* USER CODE END Private defines */
 
 #ifdef __cplusplus
 }
