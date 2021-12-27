@@ -78,7 +78,7 @@ static void entry_action_exec_proc(led_animation_fsm_t *handle)
  * @param gpio 
  * @return uint8_t 
  */
-static uint8_t led_animation_set_gpio(led_animation_fsm_t *handle, led_pin_port_t *gpio)
+uint8_t led_animation_set_gpio(led_animation_fsm_t *handle, led_pin_port_t *gpio)
 {
     handle->iface.gpio.pin = gpio->pin;
     handle->iface.gpio.port = gpio->port;

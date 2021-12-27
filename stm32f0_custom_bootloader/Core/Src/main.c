@@ -43,17 +43,14 @@ int main(void)
 
   host_comm_rx_fsm_init(&host_comm_rx_handle, &uart2);
   host_comm_tx_fsm_init(&host_comm_tx_handle, &uart2);
-  
+
   while (1)
   {
-	  led_breath_exec();
+    led_breath_exec();
     host_comm_rx_fsm_run(&host_comm_rx_handle);
     host_comm_tx_fsm_run(&host_comm_tx_handle);
   }
 }
-
- 
-
 
 /**
   * @brief  This function is executed in case of error occurrence.

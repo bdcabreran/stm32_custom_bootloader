@@ -44,15 +44,16 @@ _Min_Stack_Size = 0x400 ; /* required amount of stack */
 
 /*
   Total memory -  256K
-  Origin       -  0x08000000
+  Origin Bootloader   -  0x08000000
   Memory for Bootloader - 32K
+  Origin App         -   0x08008000
  */
 
 /* Memories definition */
 MEMORY
 {
   RAM    (xrw)    : ORIGIN = 0x20000000,   LENGTH = 32K
-  FLASH    (rx)    : ORIGIN = 0x8008000,   LENGTH = (256K - 32K)
+  FLASH    (rx)    : ORIGIN = 0x08000000,   LENGTH = (256K - 32K)
 }
 
 /* Sections */

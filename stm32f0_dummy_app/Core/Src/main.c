@@ -9,6 +9,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "peripherals_init.h"
+#include "led_animation.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* Private typedef -----------------------------------------------------------*/
@@ -34,10 +35,11 @@ int main(void)
 {
   peripherals_init();
   print_startup_message();
+  led_pattern_init();
 
   while (1)
   {
-
+	  led_pattern_exec();
   }
 }
 
