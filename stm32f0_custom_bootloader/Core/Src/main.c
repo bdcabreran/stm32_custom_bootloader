@@ -9,6 +9,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "peripherals_init.h"
+#include "led_animation.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* Private typedef -----------------------------------------------------------*/
@@ -26,6 +27,7 @@ void print_startup_message(void)
 	printf("**************************************\r\n");
 }
 
+
 /**
   * @brief  The application entry point.
   * @retval int
@@ -33,13 +35,16 @@ void print_startup_message(void)
 int main(void)
 {
   peripherals_init();
-  //print_startup_message();
-
+  print_startup_message();
+  led_breath_init();
+  
   while (1)
   {
-
+	  led_breath_exec();
   }
 }
+
+ 
 
 
 /**

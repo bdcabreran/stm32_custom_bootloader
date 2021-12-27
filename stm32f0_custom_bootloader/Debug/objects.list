@@ -3,6 +3,8 @@
 "./Core/Src/API/time_event.o"
 "./Core/Src/API/time_irq.o"
 "./Core/Src/API/uart_driver.o"
+"./Core/Src/led_animation/led_animation.o"
+"./Core/Src/led_animation/led_animation_fsm.o"
 "./Core/Src/main.o"
 "./Core/Src/peripherals_init.o"
 "./Core/Src/stm32f0xx_hal_msp.o"
