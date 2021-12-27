@@ -19,7 +19,7 @@
 void print_startup_message(void)
 {
 	printf("**************************************\r\n");
-	printf("Brief:\t Custom Bootloader\r\n");
+	printf("Brief:\t Dummy App \r\n");
 	printf("Author:\t Bayron Cabrera \r\n");
 	printf("Board:\t STM32F0 - M0 \r\n");
 	printf("Date:\t %s\r\n", __DATE__);
@@ -33,7 +33,7 @@ void print_startup_message(void)
 int main(void)
 {
   peripherals_init();
-  //print_startup_message();
+  print_startup_message();
 
   while (1)
   {
