@@ -10,8 +10,8 @@ void led_breath_init(void)
   led_animation_t breath = {
     .brightness = LED_MAX_BRIGHTNESS,
     .execution_time = LED_ENDLESS_EXEC_TIME,
-    .period = 100,  // it means always on
-    .time_on = 100  // it means always on
+    .period = 100,  // if period == time on, it means always on
+    .time_on = 100  
   };
 
   led_pin_port_t gpio = {
