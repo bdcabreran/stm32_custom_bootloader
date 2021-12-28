@@ -86,30 +86,37 @@ typedef struct
 /* Host Header Types */
 typedef enum
 {
-    HOST_TO_TARGET_CMD_START = CMD_START,
-    HOST_TO_TARGET_CMD_TURN_ON_LED,
-    HOST_TO_TARGET_CMD_TURN_OFF_LED,
-    HOST_TO_TARGET_CMD_GET_FW_VERSION,
-    HOST_TO_TARGET_CMD_END = CMD_END
+    H2T_CMD_START = CMD_START,
+    H2T_CMD_GET_FW_VERSION,
+    H2T_CMD_ENTER_BOOTLOADER,
+    H2T_CMD_EXIT_BOOTLOADER,
+    H2T_CMD_START_HEX_FILE_FLASH,
+    H2T_CMD_PROCESS_HEX_LINE,
+    H2T_CMD_FINISH_HEX_FILE_FLASH,
+    H2T_CMD_CANCEL_HEX_FILE_FLASH,
+    H2T_CMD_JUMP_TO_APP,
+    H2T_CMD_JUMP_TO_BOOTLOADER,
+    H2T_CMD_SYNC,
+    H2T_CMD_END = CMD_END
 }host_to_target_cmd_t;
-#define IS_HOST_TO_TARGET_CMD(cmd) ((cmd > HOST_TO_TARGET_CMD_START) && (cmd < HOST_TO_TARGET_CMD_END))
+#define IS_H2T_CMD(cmd) ((cmd > H2T_CMD_START) && (cmd < H2T_CMD_END))
 
 typedef enum
 {
-    HOST_TO_TARGET_EVT_START = EVT_START,
-    HOST_TO_TARGET_EVT_END = EVT_END
+    H2T_EVT_START = EVT_START,
+    H2T_EVT_END = EVT_END
 }host_to_target_evt_t;
-#define IS_HOST_TO_TARGET_EVT(evt) ((evt > HOST_TO_TARGET_EVT_START) && (evt < HOST_TO_TARGET_EVT_END))
+#define IS_H2T_EVT(evt) ((evt > H2T_EVT_START) && (evt < H2T_EVT_END))
 
 
 typedef enum
 {
-    HOST_TO_TARGET_RES_START = RES_START,
-    HOST_TO_TARGET_RES_ACK,
-    HOST_TO_TARGET_RES_NACK,
-    HOST_TO_TARGET_RES_END = RES_END
+    H2T_RES_START = RES_START,
+    H2T_RES_ACK,
+    H2T_RES_NACK,
+    H2T_RES_END = RES_END
 }host_to_target_resp_t;
-#define IS_HOST_TO_TARGET_RES(res) ((res > HOST_TO_TARGET_RES_START) && (res < HOST_TO_TARGET_RES_END))
+#define IS_H2T_RES(res) ((res > H2T_RES_START) && (res < H2T_RES_END))
 
 
 /*##################################################################################################*/
@@ -117,33 +124,40 @@ typedef enum
 /* Target Header Types*/
 typedef enum
 {
-    TARGET_TO_HOST_CMD_START = CMD_START,
-    TARGET_TO_HOST_CMD_END = CMD_END
+    T2H_CMD_START = CMD_START,
+    T2H_CMD_END = CMD_END
 }target_to_host_cmd_t;
-#define IS_TARGET_TO_HOST_CMD(cmd) ((cmd > TARGET_TO_HOST_CMD_START) && (cmd < TARGET_TO_HOST_CMD_END))
+#define IS_T2H_CMD(cmd) ((cmd > T2H_CMD_START) && (cmd < T2H_CMD_END))
 
 
 typedef enum
 {
-    TARGET_TO_HOST_EVT_START = EVT_START,
-    TARGET_TO_HOST_EVT_HANDLER_ERROR,
-    TARGET_TO_HOST_EVT_PRINT_DBG_MSG,
-    TARGET_TO_HOST_EVT_END = EVT_END
+    T2H_EVT_START = EVT_START,
+    T2H_EVT_HANDLER_ERROR,
+    T2H_EVT_PRINT_DBG_MSG,
+    T2H_EVT_BOOTLOADER_COUNTDOWN,
+    T22_EVT_BOOTLOADER_TIMEOUT,
+    T2H_EVT_END = EVT_END
 }target_to_host_evt_t;
-#define IS_TARGET_TO_HOST_EVT(evt) ((evt > TARGET_TO_HOST_EVT_START) && (evt < TARGET_TO_HOST_EVT_END))
+#define IS_T2H_EVT(evt) ((evt > T2H_EVT_START) && (evt < T2H_EVT_END))
 
 
 typedef enum
 {
-    TARGET_TO_HOST_RES_START = RES_START,
-    TARGET_TO_HOST_RES_ACK,
-    TARGET_TO_HOST_RES_NACK,
-    TARGET_TO_HOST_RES_LED_ON,
-    TARGET_TO_HOST_RES_LED_OFF,
-    TARGET_TO_HOST_RES_FW_VERSION,
-    TARGET_TO_HOST_RES_END = RES_END
+    T2H_RES_START = RES_START,
+    T2H_RES_SYNC,
+    T2H_RES_ACK,
+    T2H_RES_NACK,
+    T2H_RES_FW_VERSION,
+    T2H_HEX_FLASH_FAIL,
+    T2H_HEX_FLASH_SUCCEED,
+    T2H_HEX_FLASH_CANCELED,
+    T2H_RES_JUMP_TO_BOOTLOADER_OK,
+    T2H_RES_EXIT_BOOTLOADER_OK,
+    T2H_RES_EXIT_BOOTLOADER_FAIL,
+    T2H_RES_END = RES_END
 }target_to_host_resp_t;
-#define IS_TARGET_TO_HOST_RES(res) ((res > TARGET_TO_HOST_RES_START) && (res < TARGET_TO_HOST_RES_END))
+#define IS_T2H_RES(res) ((res > T2H_RES_START) && (res < T2H_RES_END))
 
 
 /*##################################################################################################*/

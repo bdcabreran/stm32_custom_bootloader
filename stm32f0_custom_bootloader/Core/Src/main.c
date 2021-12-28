@@ -10,7 +10,7 @@
 #include "main.h"
 #include "peripherals_init.h"
 #include "led_animation.h"
-#include "host_comm_rx_fsm.h"
+#include "host_comm_fsm.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* Private typedef -----------------------------------------------------------*/
@@ -41,14 +41,13 @@ int main(void)
 
   led_breath_init();
 
-  host_comm_rx_fsm_init(&host_comm_rx_handle, &uart2);
-  host_comm_tx_fsm_init(&host_comm_tx_handle, &uart2);
+  host_comm_fsm_init(&uart2);
 
   while (1)
   {
-    led_breath_exec();
-    host_comm_rx_fsm_run(&host_comm_rx_handle);
-    host_comm_tx_fsm_run(&host_comm_tx_handle);
+    led_breath_run();
+
+    host_comm_fsm_run();
   }
 }
 

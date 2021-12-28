@@ -35,9 +35,9 @@ uint16_t payload_len;
 
 uint8_t protocol_check_valid_header(packet_data_t *packet)
 {
-    if (IS_HOST_TO_TARGET_CMD(packet->header.type.cmd) ||
-        IS_HOST_TO_TARGET_EVT(packet->header.type.evt) ||
-        IS_HOST_TO_TARGET_RES(packet->header.type.res))
+    if (IS_H2T_CMD(packet->header.type.cmd) ||
+        IS_H2T_EVT(packet->header.type.evt) ||
+        IS_H2T_RES(packet->header.type.res))
     {
         /*check payload len */
         if(packet->header.payload_len < MAX_PAYLOAD_SIZE)

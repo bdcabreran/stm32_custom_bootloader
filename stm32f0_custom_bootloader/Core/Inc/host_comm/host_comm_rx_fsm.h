@@ -57,13 +57,15 @@ typedef enum
 /*
  * Type definition of the data structure for time events
 */
-typedef struct 
+typedef struct
 {
-    time_event_t header_timeout;
-    time_event_t payload_timeout;
-    time_event_t crc_and_postamble_timeout;
-}host_comm_rx_time_events_t;
-
+    union
+    {
+        time_event_t header_timeout;
+        time_event_t payload_timeout;
+        time_event_t crc_and_postamble_timeout;
+    };
+} host_comm_rx_time_events_t;
 
 typedef struct
 {

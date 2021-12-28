@@ -24,7 +24,7 @@ void led_breath_init(void)
 }
 
 
-void led_breath_exec(void)
+void led_breath_run(void)
 {
   led_animation_run(&led1_fsm);
 
