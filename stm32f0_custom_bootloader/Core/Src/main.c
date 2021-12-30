@@ -12,6 +12,7 @@
 #include "peripherals_init.h"
 #include "led_animation.h"
 #include "host_comm_fsm.h"
+#include "stdint.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* Private typedef -----------------------------------------------------------*/

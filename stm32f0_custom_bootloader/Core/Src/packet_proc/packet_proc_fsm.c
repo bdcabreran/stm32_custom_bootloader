@@ -227,7 +227,7 @@ static void host_cmd_get_fw_ver_handler(void)
     packet.header.payload_len = strlen(VERS) + 1;
     memcpy((uint8_t *)&packet.payload, (uint8_t*)&VERS, packet.header.payload_len);
 
-    host_comm_tx_fsm_send_packet(&host_comm_tx_handle, &packet, true);
+    host_comm_tx_fsm_send_packet(&host_comm_tx_handle, &packet, MAX_NUM_OF_TRANSFER_RETRIES);
 }
 
 static void host_cmd_enter_boot_handler(packet_data_t *packet)

@@ -199,7 +199,7 @@ static bool header_proc_on_react(host_comm_rx_fsm_t *handle, const bool try_tran
 				host_comm_rx_dbg("ev_internal \t[ header timeout ]\r\n");
 			}
 
-			host_comm_tx_fsm_send_packet_no_payload(&host_comm_tx_handle, T2H_RES_NACK, false);
+			host_comm_tx_fsm_send_packet_no_payload(&host_comm_tx_handle, T2H_RES_NACK, 0);
 
 			/*Exit Action*/
 			exit_action_header_proc(handle);
@@ -280,7 +280,7 @@ static bool payload_proc_on_react(host_comm_rx_fsm_t *handle, const bool try_tra
 			/*Transition Action*/
 			host_comm_rx_dbg("ev_internal \t[ timeout payload ] \r\n");
 			uart_clear_rx_data(handle->iface.driver);
-			host_comm_tx_fsm_send_packet_no_payload(&host_comm_tx_handle, T2H_RES_NACK, false);
+			host_comm_tx_fsm_send_packet_no_payload(&host_comm_tx_handle, T2H_RES_NACK, 0);
 
 			/*Enter Sequence*/
 			enter_seq_preamble_proc(handle);
@@ -367,7 +367,7 @@ static bool crc_and_postamble_proc_on_react(host_comm_rx_fsm_t *handle, const bo
 
 			/*Transition Action*/
 			if(handle->iface.packet.header.type.res != H2T_RES_ACK)
-				host_comm_tx_fsm_send_packet_no_payload(&host_comm_tx_handle, T2H_RES_ACK, false);
+				host_comm_tx_fsm_send_packet_no_payload(&host_comm_tx_handle, T2H_RES_ACK, 0);
 
 			/*Enter sequence */
 			enter_seq_packet_ready(handle);
@@ -387,7 +387,7 @@ static bool crc_and_postamble_proc_on_react(host_comm_rx_fsm_t *handle, const bo
 				uart_clear_rx_data(handle->iface.driver);
 			}
 
-			host_comm_tx_fsm_send_packet_no_payload(&host_comm_tx_handle, T2H_RES_NACK, false);
+			host_comm_tx_fsm_send_packet_no_payload(&host_comm_tx_handle, T2H_RES_NACK, 0);
 
 			/*Enter Sequence*/
 			enter_seq_preamble_proc(handle);

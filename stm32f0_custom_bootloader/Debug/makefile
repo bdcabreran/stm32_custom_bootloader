@@ -16,7 +16,6 @@ RM := rm -rf
 -include Core/Src/host_comm/subdir.mk
 -include Core/Src/API/subdir.mk
 -include Core/Src/subdir.mk
--include subdir.mk
 -include objects.mk
 
 ifneq ($(MAKECMDGOALS),clean)
@@ -65,8 +64,8 @@ all: main-build
 main-build: stm32f0_custom_bootloader.elf secondary-outputs
 
 # Tool invocations
-stm32f0_custom_bootloader.elf: $(OBJS) $(USER_OBJS) D:\Documents\stm32_custom_bootloader\stm32f0_custom_bootloader\STM32F030CCTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "stm32f0_custom_bootloader.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0 -T"D:\Documents\stm32_custom_bootloader\stm32f0_custom_bootloader\STM32F030CCTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="stm32f0_custom_bootloader.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+stm32f0_custom_bootloader.elf: $(OBJS) $(USER_OBJS) C:\Users\BAYRON\Documents\stm32_custom_bootloader\stm32f0_custom_bootloader\STM32F030CCTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "stm32f0_custom_bootloader.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0 -T"C:\Users\BAYRON\Documents\stm32_custom_bootloader\stm32f0_custom_bootloader\STM32F030CCTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="stm32f0_custom_bootloader.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -87,7 +86,7 @@ stm32f0_custom_bootloader.bin: $(EXECUTABLES) makefile objects.list $(OPTIONAL_T
 
 # Other Targets
 clean:
-	-$(RM) $(SIZE_OUTPUT)$(OBJDUMP_LIST)$(EXECUTABLES)$(OBJS)$(S_DEPS)$(S_UPPER_DEPS)$(C_DEPS)$(OBJCOPY_BIN) stm32f0_custom_bootloader.elf
+	-$(RM) default.size.stdout stm32f0_custom_bootloader.bin stm32f0_custom_bootloader.elf stm32f0_custom_bootloader.list
 	-@echo ' '
 
 secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST) $(OBJCOPY_BIN)
@@ -99,6 +98,6 @@ fail-specified-linker-script-missing:
 warn-no-linker-script-specified:
 	@echo 'Warning: No linker script specified. Check the linker settings in the build configuration.'
 
-.PHONY: all clean dependents fail-specified-linker-script-missing warn-no-linker-script-specified
+.PHONY: all clean dependents main-build fail-specified-linker-script-missing warn-no-linker-script-specified
 
 -include ../makefile.targets

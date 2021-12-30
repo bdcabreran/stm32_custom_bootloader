@@ -20,7 +20,7 @@
 typedef struct
 {
     packet_data_t *packet; /* packet data to be transmitted */
-    bool retry;            /* retransmission in case of nack or ack timeout? */
+    uint8_t retry_cnt;            /* retransmission in case of nack or ack timeout? */
 }tx_request_t;
 
 void host_comm_tx_queue_init(void);

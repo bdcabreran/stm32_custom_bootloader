@@ -83,7 +83,7 @@ static void enter_seq_poll_pending_transfers(host_comm_tx_fsm_t *handle)
 	host_comm_tx_dbg("enter seq \t[ poll_pending_transfers ]\n");
 	host_comm_tx_fsm_set_next_state(handle, st_comm_tx_poll_pending_transfer);
     time_event_stop(&handle->event.time.ack_timeout);
-    handle->iface.retry_cnt = 0;
+    handle->iface.request.retry_cnt = 0;
 }
 
 
@@ -101,13 +101,6 @@ static void exit_action_poll_pending_transfers(host_comm_tx_fsm_t *handle)
 {
     /*Read packet to transfer */
     host_comm_tx_queue_read_request(&handle->iface.request);
-
-    /*Set retry cnt according to the transfer setting */
-    if(handle->iface.request.retry == true)
-        handle->iface.retry_cnt = MAX_NUM_OF_TRANSFER_RETRIES;
-    else
-        handle->iface.retry_cnt = 0;
-
 }
 
 
@@ -151,10 +144,10 @@ static void entry_action_transmit_packet(host_comm_tx_fsm_t *handle)
         time_event_start(&handle->event.time.ack_timeout, MAX_ACK_TIMEOUT_MS);
         host_comm_tx_dbg("time event \t[ ack resp time start ]\n");
 
-        if (handle->iface.retry_cnt > 0)
+        if (handle->iface.request.retry_cnt > 0)
         {
-            handle->iface.retry_cnt--;
-            host_comm_tx_dbg("tx retries left [%d]\n", handle->iface.retry_cnt);
+            handle->iface.request.retry_cnt--;
+            host_comm_tx_dbg("tx retries left [%d]\n", handle->iface.request.retry_cnt);
         }
     }
     else
@@ -187,7 +180,7 @@ static bool transmit_packet_on_react(host_comm_tx_fsm_t *handle, const bool try_
             host_comm_tx_dbg("time event \t[ ack resp timeout ] \n");
 
             /*Enter sequence */
-            if (handle->iface.retry_cnt == 0)
+            if (handle->iface.request.retry_cnt == 0)
                 enter_seq_poll_pending_transfers(handle);
             else
                 enter_seq_transmit_packet(handle);
@@ -276,9 +269,8 @@ uint8_t host_comm_tx_fsm_write_dbg_msg(host_comm_tx_fsm_t *handle, char *dbg_msg
 		packet.header.payload_len = strlen(dbg_msg);
 
 		tx_request_t request;
-        request.retry = true;
+        request.retry_cnt = MAX_NUM_OF_TRANSFER_RETRIES;
         request.packet = &packet;
-
 
 		/*copy dbg message to payload*/
         if((request.packet->header.payload_len > 0) && (request.packet->header.payload_len < MAX_PAYLOAD_SIZE))
@@ -294,15 +286,15 @@ uint8_t host_comm_tx_fsm_write_dbg_msg(host_comm_tx_fsm_t *handle, char *dbg_msg
 	return 0;
 }
 
-uint8_t host_comm_tx_fsm_send_packet(host_comm_tx_fsm_t *handle, packet_data_t *packet, bool retry)
+uint8_t host_comm_tx_fsm_send_packet(host_comm_tx_fsm_t *handle, packet_data_t *packet, uint8_t retry_cnt)
 {
     tx_request_t request = {
-        .retry = retry,
+        .retry_cnt = retry_cnt,
         .packet = &packet};
     return host_comm_tx_queue_write_request(&request);
 }
 
-uint8_t host_comm_tx_fsm_send_packet_no_payload(host_comm_tx_fsm_t *handle, uint8_t type, bool retry)
+uint8_t host_comm_tx_fsm_send_packet_no_payload(host_comm_tx_fsm_t *handle, uint8_t type, uint8_t retry_cnt)
 {
     /*form header*/
     packet_data_t packet = 
@@ -314,7 +306,7 @@ uint8_t host_comm_tx_fsm_send_packet_no_payload(host_comm_tx_fsm_t *handle, uint
 
     tx_request_t request = 
     {
-        .retry = retry,
+        .retry_cnt = retry_cnt,
         .packet = &packet
     };
 

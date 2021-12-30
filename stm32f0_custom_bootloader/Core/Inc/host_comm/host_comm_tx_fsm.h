@@ -84,7 +84,6 @@ typedef struct
 typedef struct
 {
     uart_driver_t *driver;
-    uint8_t retry_cnt;          /* counter for number of transmission retry */
     tx_request_t request;       /* tx request with the data to be transmitted */
 } host_comm_tx_iface_t;
 
@@ -110,8 +109,8 @@ void host_comm_tx_fsm_set_ext_event(host_comm_tx_fsm_t* handle, host_comm_tx_ext
 /**@Miscellaneous */
 void crc32_accumulate(uint32_t *buff, size_t len, uint32_t *crc_value);
 uint8_t host_comm_tx_fsm_write_dbg_msg(host_comm_tx_fsm_t *handle, char *dbg_msg);
-uint8_t host_comm_tx_fsm_send_packet_no_payload(host_comm_tx_fsm_t *handle, uint8_t type, bool retry);
-uint8_t host_comm_tx_fsm_send_packet(host_comm_tx_fsm_t *handle, packet_data_t *packet, bool retry);
+uint8_t host_comm_tx_fsm_send_packet_no_payload(host_comm_tx_fsm_t *handle, uint8_t type, uint8_t retry_cnt);
+uint8_t host_comm_tx_fsm_send_packet(host_comm_tx_fsm_t *handle, packet_data_t *packet, uint8_t retry_cnt);
 
 
 /**
