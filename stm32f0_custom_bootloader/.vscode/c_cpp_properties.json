@@ -11,7 +11,8 @@
                 "${workspaceFolder}/Drivers/STM32F0xx_HAL_Driver/Inc/Legacy",
                 "${workspaceFolder}/Drivers/CMSIS/Include",
                 "${workspaceFolder}/Core/Inc/led_animation",
-                "${workspaceFolder}/Core/Inc/host_comm"
+                "${workspaceFolder}/Core/Inc/host_comm",
+                "${workspaceFolder}/Core/Inc/packet_proc"
             ],
             "defines": [
                 "DEBUG",

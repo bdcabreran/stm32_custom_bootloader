@@ -8,6 +8,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "version.h"
 #include "peripherals_init.h"
 #include "led_animation.h"
 #include "host_comm_fsm.h"
@@ -17,19 +18,17 @@
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 
-#define VERS "v1.0"
 
 void print_startup_message(void)
 {
-	printf("**************************************\r\n");
-	printf("Brief:\t Custom Bootloader \r\n");
-	printf("Author:\t Bayron Cabrera \r\n");
-	printf("Board:\t STM32F0 - M0 \r\n");
+  printf("**************************************\r\n");
+  printf("Brief:\t Custom Bootloader \r\n");
+  printf("Author:\t Bayron Cabrera \r\n");
+  printf("Board:\t STM32F0 - M0 \r\n");
   printf("Version:\t %s \r\n", VERS);
-	printf("Date:\t %s \r\n", __DATE__);
-	printf("**************************************\r\n");
+  printf("Date:\t %s \r\n", __DATE__);
+  printf("**************************************\r\n");
 }
-
 
 /**
   * @brief  The application entry point.
@@ -39,7 +38,7 @@ int main(void)
 {
   peripherals_init();
   print_startup_message();
-  
+
   led_bootloader_init();
   host_comm_fsm_init(&uart2);
 

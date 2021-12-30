@@ -1,10 +1,11 @@
-/**
+ /**
  * @file host_comm_tx_fsm.h
- * @author Bayron Cabrera (bayron.cabrera@titoma.com)
- * @brief This state machine is in charge of the tx communication between Host and test Jig using protocol.h
- * @copyright Copyright (c) 2020
+ * @author Bayron Cabrera (bdcabreran@unal.edu.com)
+ * @brief 
+ * @copyright Copyright (c) 2021
  * 
  */
+
 
 #ifndef HOST_COMM_TX_FSM
 #define HOST_COMM_TX_FSM
@@ -39,7 +40,6 @@ typedef enum
 {
     ev_int_comm_tx_invalid,
     ev_int_comm_tx_pending_packet,
-    ev_int_comm_tx_no_ack_expected,
     ev_int_comm_tx_last,
 }host_comm_tx_internal_events_t;
 
@@ -109,8 +109,9 @@ void host_comm_tx_fsm_set_ext_event(host_comm_tx_fsm_t* handle, host_comm_tx_ext
 
 /**@Miscellaneous */
 void crc32_accumulate(uint32_t *buff, size_t len, uint32_t *crc_value);
-uint8_t host_comm_tx_fsm_write_dbg_msg(host_comm_tx_fsm_t *handle, char *dbg_msg, bool ack_expected);
-uint8_t host_comm_tx_fsm_send_packet_no_payload(host_comm_tx_fsm_t *handle, uint8_t type, bool ack_expected);
+uint8_t host_comm_tx_fsm_write_dbg_msg(host_comm_tx_fsm_t *handle, char *dbg_msg);
+uint8_t host_comm_tx_fsm_send_packet_no_payload(host_comm_tx_fsm_t *handle, uint8_t type, bool retry);
+uint8_t host_comm_tx_fsm_send_packet(host_comm_tx_fsm_t *handle, packet_data_t *packet, bool retry);
 
 
 /**

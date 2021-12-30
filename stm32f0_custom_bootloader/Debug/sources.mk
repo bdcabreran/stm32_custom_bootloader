@@ -24,6 +24,7 @@ Core/Src/API \
 Core/Src/host_comm \
 Core/Src/led_animation \
 Core/Src \
+Core/Src/packet_proc \
 Core/Startup \
 Drivers/STM32F0xx_HAL_Driver/Src \
 

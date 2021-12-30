@@ -35,19 +35,14 @@ static void led_blink_init(void)
     .time_on = 30  
   };
 
-  led_pin_port_t gpio = {
-    .pin =LED2_Pin,
-    .port = LED2_GPIO_Port
-  };
-
+  led_pin_port_t gpio;
+  gpio.pin =LED2_Pin;
+  gpio.port = LED2_GPIO_Port;
   led_animation_init(&led2_fsm, &gpio, &blink);
 
   /* Animation for bootloader countdown action */
-  led_pin_port_t gpio = {
-    .pin =LED3_Pin,
-    .port = LED3_GPIO_Port
-  };
-
+  gpio.pin =LED3_Pin;
+  gpio.port = LED3_GPIO_Port;
   led_animation_init(&led3_fsm, &gpio, &blink);
 }
 
@@ -92,4 +87,11 @@ void led_bootloader_run(void)
 {
   led_blink_run();
   led_breath_run();
+}
+
+void led_bootloader_time_event_update(void)
+{
+  led_animation_update_timers(&led1_fsm);
+  led_animation_update_timers(&led2_fsm);
+  led_animation_update_timers(&led3_fsm);
 }

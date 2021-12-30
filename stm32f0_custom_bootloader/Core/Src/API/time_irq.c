@@ -12,11 +12,8 @@
 void HAL_SYSTICK_Callback(void)
 {
     /* update FSM time events*/
-    led_animation_update_timers(&led1_fsm);
-    led_animation_update_timers(&led2_fsm);
-    led_animation_update_timers(&led3_fsm);
+    led_bootloader_time_event_update();
 
     /* update host comm fsm time events */
     host_comm_fsm_time_event_update();
-
 }

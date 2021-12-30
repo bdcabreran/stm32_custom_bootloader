@@ -1,7 +1,9 @@
 /**
- * @file led_animation.h
- * @author Bayron Cabrera (bayron.cabrera@titima.com)
- * @copyright Copyright (c) 2021 
+ * @file packet_proc_fsm.h
+ * @author Bayron Cabrera (bdcabreran@unal.edu.com)
+ * @brief 
+ * @copyright Copyright (c) 2021
+ * 
  */
 
 #ifndef LED_ANIMATION_FSM_H

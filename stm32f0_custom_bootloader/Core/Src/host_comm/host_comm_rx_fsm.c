@@ -14,7 +14,6 @@
 	} while (0)
 #endif
 
-/*UART 2 will be used for host communication */
 
 /**@ Extern handle for server communication state machine */
 host_comm_rx_fsm_t host_comm_rx_handle;
@@ -367,7 +366,8 @@ static bool crc_and_postamble_proc_on_react(host_comm_rx_fsm_t *handle, const bo
 			exit_action_crc_and_postamble_proc(handle);
 
 			/*Transition Action*/
-			host_comm_tx_fsm_send_packet_no_payload(&host_comm_tx_handle, T2H_RES_ACK, false);
+			if(handle->iface.packet.header.type.res != H2T_RES_ACK)
+				host_comm_tx_fsm_send_packet_no_payload(&host_comm_tx_handle, T2H_RES_ACK, false);
 
 			/*Enter sequence */
 			enter_seq_packet_ready(handle);
@@ -417,6 +417,7 @@ static void enter_seq_packet_ready(host_comm_rx_fsm_t *handle)
 static void entry_action_packet_ready(host_comm_rx_fsm_t *handle)
 {
 	/*Notify or enqueue data for other fsm process*/
+
 
 }
 

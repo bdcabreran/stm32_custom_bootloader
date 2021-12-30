@@ -1,3 +1,11 @@
+/**
+ * @file host_comm_rx_fsm.h
+ * @author Bayron Cabrera (bdcabreran@unal.edu.com)
+ * @brief 
+ * @copyright Copyright (c) 2021
+ * 
+ */
+
 #ifndef HOST_COMM_TX_FSM_H
 #define HOST_COMM_TX_FSM_H
 

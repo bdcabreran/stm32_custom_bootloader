@@ -48,6 +48,7 @@
 									<listOptionValue builtIn="false" value="../Core/Inc/API"/>
 									<listOptionValue builtIn="false" value="../Core/Inc/led_animation"/>
 									<listOptionValue builtIn="false" value="../Core/Inc/host_comm"/>
+									<listOptionValue builtIn="false" value="../Core/Inc/packet_proc"/>
 								</option>
 								<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c.14452101" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c"/>
 							</tool>

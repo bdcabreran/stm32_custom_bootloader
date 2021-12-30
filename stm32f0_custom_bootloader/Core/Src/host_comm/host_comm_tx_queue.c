@@ -49,12 +49,11 @@ size_t host_comm_tx_queue_get_pending_transfers(void)
 uint8_t host_comm_tx_queue_write_request(tx_request_t *tx_request)
 {
     /* Temporal variable to check free space needed to write packet in tx queue */
-    uint8_t packet_data_len = HEADER_SIZE_BYTES + tx_request->packet.header.payload_len;
+    uint8_t packet_data_len = HEADER_SIZE_BYTES + tx_request->packet->header.payload_len;
 
     if (circular_buff_get_free_space(tx_queue.cb) > packet_data_len + 1) //include byte for req src 
     {
-        circular_buff_put(tx_queue.cb, (uint8_t)tx_request->src);
-        circular_buff_put(tx_queue.cb, (uint8_t)tx_request->ack_expected);
+        circular_buff_put(tx_queue.cb, (uint8_t)tx_request->retry);
         circular_buff_write(tx_queue.cb, (uint8_t *)&tx_request->packet, packet_data_len);
         tx_queue.packet_cnt++;
 
@@ -75,10 +74,9 @@ uint8_t host_comm_tx_queue_read_request(tx_request_t *tx_request)
 {
     if (tx_queue.packet_cnt > 0)
     {
-        circular_buff_get(tx_queue.cb, (uint8_t *)&tx_request->src);
-        circular_buff_get(tx_queue.cb, (uint8_t *)&tx_request->ack_expected);
-        circular_buff_read(tx_queue.cb, (uint8_t *)&tx_request->packet.header, HEADER_SIZE_BYTES);
-        circular_buff_read(tx_queue.cb, (uint8_t *)&tx_request->packet.payload, tx_request->packet.header.payload_len);
+        circular_buff_get(tx_queue.cb, (uint8_t *)&tx_request->retry);
+        circular_buff_read(tx_queue.cb, (uint8_t *)&tx_request->packet->header, HEADER_SIZE_BYTES);
+        circular_buff_read(tx_queue.cb, (uint8_t *)&tx_request->packet->payload, tx_request->packet->header.payload_len);
         tx_queue.packet_cnt--;
 
         return 1;
@@ -94,10 +92,9 @@ uint8_t host_comm_tx_queue_fetch_request(tx_request_t *tx_request)
 {
     if (tx_queue.packet_cnt > 0)
     {
-        circular_buff_fetch(tx_queue.cb, (uint8_t *)&tx_request->src, 1);
-        circular_buff_fetch(tx_queue.cb, (uint8_t *)&tx_request->ack_expected, 1);
-        circular_buff_fetch(tx_queue.cb, (uint8_t *)&tx_request->packet.header, HEADER_SIZE_BYTES);
-        circular_buff_fetch(tx_queue.cb, (uint8_t *)&tx_request->packet.payload, tx_request->packet.header.payload_len);
+        circular_buff_fetch(tx_queue.cb, (uint8_t *)&tx_request->retry, 1);
+        circular_buff_fetch(tx_queue.cb, (uint8_t *)&tx_request->packet->header, HEADER_SIZE_BYTES);
+        circular_buff_fetch(tx_queue.cb, (uint8_t *)&tx_request->packet->payload, tx_request->packet->header.payload_len);
         return 1;
     }
     return 0;

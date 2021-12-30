@@ -10,7 +10,7 @@ extern led_animation_fsm_t led3_fsm;
 
 void led_bootloader_init(void);
 void led_bootloader_run(void);
-
+void led_bootloader_time_event_update(void);
 
 
 #endif 
