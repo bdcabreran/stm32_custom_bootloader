@@ -8,8 +8,8 @@ extern led_animation_fsm_t led1_fsm;
 extern led_animation_fsm_t led2_fsm;
 extern led_animation_fsm_t led3_fsm;
 
-void led_breath_init(void);
-void led_breath_run(void);
+void led_bootloader_init(void);
+void led_bootloader_run(void);
 
 
 

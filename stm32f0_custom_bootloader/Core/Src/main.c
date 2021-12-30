@@ -17,14 +17,16 @@
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 
+#define VERS "v1.0"
 
 void print_startup_message(void)
 {
 	printf("**************************************\r\n");
-	printf("Brief:\t Custom Bootloader\r\n");
+	printf("Brief:\t Custom Bootloader \r\n");
 	printf("Author:\t Bayron Cabrera \r\n");
 	printf("Board:\t STM32F0 - M0 \r\n");
-	printf("Date:\t %s\r\n", __DATE__);
+  printf("Version:\t %s \r\n", VERS);
+	printf("Date:\t %s \r\n", __DATE__);
 	printf("**************************************\r\n");
 }
 
@@ -36,17 +38,14 @@ void print_startup_message(void)
 int main(void)
 {
   peripherals_init();
-
   print_startup_message();
-
-  led_breath_init();
-
+  
+  led_bootloader_init();
   host_comm_fsm_init(&uart2);
 
   while (1)
   {
-    led_breath_run();
-
+    led_bootloader_run();
     host_comm_fsm_run();
   }
 }
