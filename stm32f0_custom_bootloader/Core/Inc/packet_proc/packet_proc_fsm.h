@@ -55,12 +55,12 @@ typedef struct
 {
    packet_proc_external_event_name_t name;
    packet_proc_external_event_data_t data;
-}packet_proc_external_events_t;
+}packet_proc_external_event_t;
 
 
 typedef struct
 {
-    packet_proc_external_events_t external;
+    packet_proc_external_event_t external;
 } packet_proc_event_t;
 
 
@@ -79,9 +79,7 @@ extern packet_proc_fsm_t packet_proc_handle;
 /**@Exported Functions*/
 void packet_proc_fsm_init(packet_proc_fsm_t *handle);
 void packet_proc_fsm_run(packet_proc_fsm_t *handle);
-
-void packet_proc_fsm_time_event_update(packet_proc_fsm_t *handle);
 bool packet_proc_fsm_is_active(const packet_proc_fsm_t *handle);
-uint8_t packet_proc_fsm_set_ext_event(packet_proc_fsm_t *handle, packet_proc_external_events_t *event);
+uint8_t packet_proc_fsm_set_ext_event(packet_proc_fsm_t *handle, packet_proc_external_event_t *event);
 
 #endif

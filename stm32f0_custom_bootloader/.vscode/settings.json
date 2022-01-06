@@ -16,6 +16,7 @@
         "stm32f0xx.h": "c",
         "led_animation.h": "c",
         "led_animation_fsm.h": "c",
-        "host_comm_fsm.h": "c"
+        "host_comm_fsm.h": "c",
+        "packet_proc_fsm.h": "c"
     }
 }

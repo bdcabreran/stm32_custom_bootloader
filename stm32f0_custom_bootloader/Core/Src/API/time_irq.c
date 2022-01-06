@@ -3,6 +3,7 @@
 #include "stm32f0xx_hal.h"
 #include "led_animation.h"
 #include "host_comm_fsm.h"
+#include "bootloader_fsm.h"
 
 
 /**
@@ -16,4 +17,7 @@ void HAL_SYSTICK_Callback(void)
 
     /* update host comm fsm time events */
     host_comm_fsm_time_event_update();
+
+    /* bootloader fsm time event update */
+    boot_fsm_fsm_time_event_update(&boot_handle);
 }

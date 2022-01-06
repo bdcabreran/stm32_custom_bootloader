@@ -32,6 +32,7 @@ static void host_cmd_exit_boot_handler(packet_data_t *packet);
 static void host_cmd_start_hex_flash_handler(packet_data_t *packet); 
 static void host_cmd_proc_hex_line_handler(packet_data_t *packet);   
 static void host_cmd_finish_hex_flash_handler(packet_data_t *packet);
+static void host_cmd_finish_hex_sync_handler(void);
 
 /*##################################*/
 /*#### Host Response Handlers #######*/
@@ -182,7 +183,7 @@ static bool st_packet_proc_host_cmd_on_react(packet_proc_fsm_t *handle)
     case H2T_CMD_START_HEX_FILE_FLASH:  host_cmd_start_hex_flash_handler(packet);  break; 
     case H2T_CMD_PROCESS_HEX_FILE_LINE: host_cmd_proc_hex_line_handler(packet);    break; 
     case H2T_CMD_FINISH_HEX_FILE_FLASH: host_cmd_finish_hex_flash_handler(packet); break; 
-    case H2T_CMD_SYNC: break; 
+    case H2T_CMD_SYNC:                  host_cmd_finish_hex_sync_handler();        break; 
 
     default:
         break;
@@ -209,7 +210,7 @@ bool packet_proc_fsm_is_active(const packet_proc_fsm_t *handle)
 	return result;
 }
 
-uint8_t packet_proc_fsm_set_ext_event(packet_proc_fsm_t *handle, packet_proc_external_events_t *event)
+uint8_t packet_proc_fsm_set_ext_event(packet_proc_fsm_t *handle, packet_proc_external_event_t *event)
 {
 	handle->event.external.name = event->name;
 	handle->event.external.data.packet = event->data.packet;
@@ -255,6 +256,14 @@ static void host_cmd_finish_hex_flash_handler(packet_data_t *packet)
     
 }
 
+static void host_cmd_finish_hex_sync_handler(void)
+{
+    packet_data_t packet; 
+    packet.header.dir = TARGET_TO_HOST;
+    packet.header.type.res = T2H_RES_SYNC;
+    packet.header.payload_len = 0;
+    host_comm_tx_fsm_send_packet(&host_comm_tx_handle, &packet, MAX_NUM_OF_TRANSFER_RETRIES);
+}
 
 /*##################################*/
 /*#### Host Response Handlers #######*/

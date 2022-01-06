@@ -1,4 +1,5 @@
 #include "host_comm_rx_fsm.h"
+#include "packet_proc_fsm.h"
 
 /**@brief Enable/Disable debug messages */
 #define HOST_RX_DEBUG 0
@@ -416,9 +417,11 @@ static void enter_seq_packet_ready(host_comm_rx_fsm_t *handle)
 
 static void entry_action_packet_ready(host_comm_rx_fsm_t *handle)
 {
-	/*Notify or enqueue data for other fsm process*/
-
-
+	/*Notify packet ready to packet processing state machine */
+	packet_proc_external_event_t event;
+	event.name = ev_ext_packet_proc_new;
+	event.data.packet = &handle->iface.packet;
+	packet_proc_fsm_set_ext_event(&packet_proc_handle, &event);
 }
 
 static bool packet_ready_on_react(host_comm_rx_fsm_t *handle, const bool try_transition)

@@ -19,6 +19,7 @@ int _write(int file, char *ptr, int len)
 	uart_transmit_it(&uart1, (uint8_t*)ptr, len);
 	return len;
 }
+
 #else
 #define printf(format, ...) do{ /*Do nothing */ }while(0); 
 #endif
