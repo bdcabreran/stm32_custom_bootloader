@@ -14,6 +14,7 @@
 #define COUTDOWN_TIMEOUT_MS (3000) 
 #define COUTDOWN_MSG_TIMEOUT_MS (200) //send countdown msg to host every 0.2s
 #define BOOT_TIMEOUT_MS     (1000*60) //safe exit in boot mode if no cmd is received 
+#define MAX_HEX_FRAME_LEN   (64)
 
 /*
  * Enum of states names in the statechart.
@@ -55,7 +56,7 @@ typedef enum
     ev_ext_boot_invalid,
     ev_ext_boot_exit,
     ev_ext_boot_enter,
-    ev_ext_boot_write_line,
+    ev_ext_boot_proc_line,
     ev_ext_boot_finish_hex,
     ev_ext_boot_start_hex,
     ev_ext_boot_last,
@@ -74,7 +75,7 @@ typedef struct
 
 typedef struct
 {
-    packet_data_t packet;  
+    packet_data_t *packet;  
 }boot_external_event_data_t;
 
 typedef struct
@@ -98,10 +99,16 @@ typedef struct
 
 typedef struct
 {
-    uint32_t crc_accumulated;
-    uint32_t exp_hex_lines;
-}boot_iface_t;
+    uint32_t crc32;
+    uint16_t len_bytes;
+    uint16_t line_cnt;
+    uint8_t line[MAX_HEX_FRAME_LEN];
+}hex_file_data_t;
 
+typedef struct
+{
+    hex_file_data_t hex_file;
+} boot_iface_t;
 
 /*! 
  * Type definition of the data structure for the communication state machine.

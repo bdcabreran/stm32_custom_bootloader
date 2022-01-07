@@ -1,5 +1,6 @@
 #include "packet_proc_fsm.h"
 #include "version.h"
+#include "bootloader_fsm.h"
 
 /**@brief Enable/Disable debug messages */
 #define PACKET_PROC_DEBUG 0
@@ -180,9 +181,9 @@ static bool st_packet_proc_host_cmd_on_react(packet_proc_fsm_t *handle)
     case H2T_CMD_GET_FW_VERSION:        host_cmd_get_fw_ver_handler();             break;
     case H2T_CMD_ENTER_BOOTLOADER:      host_cmd_enter_boot_handler(packet);       break; 
     case H2T_CMD_EXIT_BOOTLOADER:       host_cmd_exit_boot_handler(packet);        break; 
-    case H2T_CMD_START_HEX_FILE_FLASH:  host_cmd_start_hex_flash_handler(packet);  break; 
-    case H2T_CMD_PROCESS_HEX_FILE_LINE: host_cmd_proc_hex_line_handler(packet);    break; 
-    case H2T_CMD_FINISH_HEX_FILE_FLASH: host_cmd_finish_hex_flash_handler(packet); break; 
+    case H2T_CMD_START_HEX_FLASH:       host_cmd_start_hex_flash_handler(packet);  break; 
+    case H2T_CMD_PROC_HEX_LINE:         host_cmd_proc_hex_line_handler(packet);    break; 
+    case H2T_CMD_FINISH_HEX_FLASH:      host_cmd_finish_hex_flash_handler(packet); break; 
     case H2T_CMD_SYNC:                  host_cmd_finish_hex_sync_handler();        break; 
 
     default:
@@ -226,34 +227,46 @@ static void host_cmd_get_fw_ver_handler(void)
     packet.header.dir = TARGET_TO_HOST;
     packet.header.type.res = T2H_RES_FW_VERSION;
     packet.header.payload_len = strlen(VERS) + 1;
-    memcpy((uint8_t *)&packet.payload, (uint8_t*)&VERS, packet.header.payload_len);
+    memcpy((uint8_t *)&packet.payload.buffer, (uint8_t*)&VERS, packet.header.payload_len);
 
     host_comm_tx_fsm_send_packet(&host_comm_tx_handle, &packet, MAX_NUM_OF_TRANSFER_RETRIES);
 }
 
 static void host_cmd_enter_boot_handler(packet_data_t *packet)
 {
-    
+    boot_external_event_t ev;
+    ev.name = ev_ext_boot_enter;
+    boot_fsm_set_ext_event(&boot_handle, &ev);
 }
 
 static void host_cmd_exit_boot_handler(packet_data_t *packet)
 {
-    
+    boot_external_event_t ev;
+    ev.name = ev_ext_boot_exit;
+    boot_fsm_set_ext_event(&boot_handle, &ev);
 }
 
 static void host_cmd_start_hex_flash_handler(packet_data_t *packet)
 {
-    
+    boot_external_event_t ev;
+    ev.name = ev_ext_boot_start_hex;
+    ev.data.packet = packet;
+    boot_fsm_set_ext_event(&boot_handle, &ev);
 }
 
 static void host_cmd_proc_hex_line_handler(packet_data_t *packet)
 {
-    
+    boot_external_event_t ev;
+    ev.name = ev_ext_boot_proc_line;
+    ev.data.packet = packet;
+    boot_fsm_set_ext_event(&boot_handle, &ev);
 }
 
 static void host_cmd_finish_hex_flash_handler(packet_data_t *packet)
 {
-    
+       boot_external_event_t ev;
+    ev.name = ev_ext_boot_finish_hex;
+    boot_fsm_set_ext_event(&boot_handle, &ev); 
 }
 
 static void host_cmd_finish_hex_sync_handler(void)

@@ -54,45 +54,19 @@ typedef enum
     TARGET_TO_HOST = TARGET_TO_HOST_DIR,
 }packet_dir_t;
 
-typedef struct
-{
-    union
-    {
-        uint8_t cmd;
-        uint8_t res;
-        uint8_t evt;
-    }type;
+/*####################################################################################################################*/
+/*##### Host to Target Types #######################################################################################*/
+/*####################################################################################################################*/
 
-    packet_dir_t  dir;
-    uint16_t payload_len;
-
-}packet_header_t;
-
-typedef struct
-{
-	uint8_t buffer[MAX_PAYLOAD_SIZE];
-
-}packet_payload_t;
-
-typedef struct
-{
-    packet_header_t  header;
-    packet_payload_t payload;
-
-}packet_data_t;
-
-/*##################################################################################################*/
-
-/* Host Header Types */
 typedef enum
 {
     H2T_CMD_START = CMD_START,
     H2T_CMD_GET_FW_VERSION,
     H2T_CMD_ENTER_BOOTLOADER,
     H2T_CMD_EXIT_BOOTLOADER,
-    H2T_CMD_START_HEX_FILE_FLASH,
-    H2T_CMD_PROCESS_HEX_FILE_LINE,
-    H2T_CMD_FINISH_HEX_FILE_FLASH,
+    H2T_CMD_START_HEX_FLASH,
+    H2T_CMD_PROC_HEX_LINE,
+    H2T_CMD_FINISH_HEX_FLASH,
     H2T_CMD_SYNC,
     H2T_CMD_END = CMD_END
 }host_to_target_cmd_t;
@@ -116,9 +90,10 @@ typedef enum
 #define IS_H2T_RES(res) ((res > H2T_RES_START) && (res < H2T_RES_END))
 
 
-/*##################################################################################################*/
+/*####################################################################################################################*/
+/*##### Target to Host Types #######################################################################################*/
+/*####################################################################################################################*/
 
-/* Target Header Types*/
 typedef enum
 {
     T2H_CMD_START = CMD_START,
@@ -130,14 +105,14 @@ typedef enum
 typedef enum
 {
     T2H_EVT_START = EVT_START,
-
     T2H_EVT_HANDLER_ERROR,
     T2H_EVT_PRINT_DBG_MSG,
     T2H_EVT_BOOTLOADER_COUNTDOWN,
     T2H_EVT_BOOTLOADER_TIMEOUT,
     T2H_EVT_JUMP_TO_USER_APP_FAIL,
-    T2H_EVT_JUMP_TO_USER_APP_SUCCEED,
-
+    T2H_EVT_JUMP_TO_USER_APP,
+    T2H_EVT_USER_APP_INTEGRITY_FAIL,
+    T2H_EVT_USER_APP_INTEGRITY_OK,
     T2H_EVT_END = EVT_END
 }target_to_host_evt_t;
 #define IS_T2H_EVT(evt) ((evt > T2H_EVT_START) && (evt < T2H_EVT_END))
@@ -149,25 +124,89 @@ typedef enum
     T2H_RES_ACK,
     T2H_RES_NACK,
     T2H_RES_FW_VERSION,
-
-    T2H_RES_START_HEX_FILE_FLASH_SUCCEED,
-    T2H_RES_FINISH_HEX_FILE_FLASH_SUCCEED,
-    T2H_RES_FINISH_HEX_FILE_FLASH_FAIL,
-
-    T2H_RES_HEX_FILE_LINE_PROC_SUCCEED,
-    T2H_RES_HEX_FILE_LINE_PROC_FAIL,
-
+    T2H_RES_START_HEX_FLASH_OK,
+    T2H_RES_FINISH_HEX_FLASH_OK,
+    T2H_RES_FINISH_HEX_FLASH_FAIL,
+    T2H_RES_HEX_LINE_OK,
+    T2H_RES_HEX_LINE_FAIL,
     T2H_RES_ENTER_BOOTLOADER_OK,    
     T2H_RES_EXIT_BOOTLOADER_OK,
     T2H_RES_EXIT_BOOTLOADER_FAIL,
-
     T2H_RES_SYNC,
     T2H_RES_END = RES_END
 }target_to_host_resp_t;
 #define IS_T2H_RES(res) ((res > T2H_RES_START) && (res < T2H_RES_END))
 
 
-/*##################################################################################################*/
+/*####################################################################################################################*/
+/*##### Target to Host Payload #######################################################################################*/
+/*####################################################################################################################*/
+
+typedef union
+{
+    struct
+    {
+        uint32_t crc32;
+        uint16_t len_bytes;
+        uint16_t line_cnt;
+    }start_hex_flash;
+
+    struct
+    {
+        uint8_t line[MAX_PAYLOAD_SIZE];
+    }proc_hex_line;
+
+}h2t_payload_t;
+
+/*####################################################################################################################*/
+/*##### Host to Target Payload #######################################################################################*/
+/*####################################################################################################################*/
+
+typedef union
+{
+    struct
+    {
+        uint8_t version[MAX_PAYLOAD_SIZE];
+    }get_version;
+
+}t2h_payload_t;
+
+/*####################################################################################################################*/
+/*##### Host to Target Payload #######################################################################################*/
+/*####################################################################################################################*/
+
+
+typedef struct
+{
+    union
+    {
+        uint8_t cmd;
+        uint8_t res;
+        uint8_t evt;
+    }type;
+
+    packet_dir_t  dir;
+    uint16_t payload_len;
+
+}packet_header_t;
+
+typedef struct
+{
+    union
+    {
+        h2t_payload_t h2t;
+        t2h_payload_t t2h;
+	    uint8_t buffer[MAX_PAYLOAD_SIZE];
+    };
+}packet_payload_t;
+
+typedef struct
+{
+    packet_header_t  header;
+    packet_payload_t payload;
+
+}packet_data_t;
+
 
 extern const byte_t protocol_preamble;
 extern const byte_t protocol_postamble;
