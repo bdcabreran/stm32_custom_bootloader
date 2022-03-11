@@ -106,7 +106,7 @@ void packet_proc_fsm_run(packet_proc_fsm_t *handle)
 {
     switch (handle->state)
     {
-    case st_packet_proc_idle:   st_packet_proc_idle_on_react(handle);   break;
+    case st_packet_proc_idle:     st_packet_proc_idle_on_react(handle);   break;
     case st_packet_proc_host_cmd: st_packet_proc_host_cmd_on_react(handle); break;
     case st_packet_proc_host_res: st_packet_proc_host_res_on_react(handle); break;
     case st_packet_proc_host_evt: st_packet_proc_host_evt_on_react(handle); break;
@@ -172,6 +172,7 @@ static bool st_packet_proc_host_res_on_react(packet_proc_fsm_t *handle)
 static bool st_packet_proc_host_cmd_on_react(packet_proc_fsm_t *handle)
 {
     bool did_transition = false;
+
     /*Add host commands here to process */
     packet_data_t *packet = handle->event.external.data.packet;
 

@@ -21,6 +21,7 @@ OBJCOPY_BIN :=
 # Every subdirectory with source files must be described here
 SUBDIRS := \
 Core/Src/API \
+Core/Src/bootloader \
 Core/Src/host_comm \
 Core/Src/led_animation \
 Core/Src \

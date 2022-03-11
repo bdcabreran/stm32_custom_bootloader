@@ -17,6 +17,8 @@
         "led_animation.h": "c",
         "led_animation_fsm.h": "c",
         "host_comm_fsm.h": "c",
-        "packet_proc_fsm.h": "c"
+        "packet_proc_fsm.h": "c",
+        "bootloader_fsm.h": "c",
+        "intel_hex_parser.h": "c"
     }
 }

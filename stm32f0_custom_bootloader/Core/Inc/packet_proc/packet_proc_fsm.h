@@ -71,7 +71,7 @@ typedef struct
 typedef struct
 {
     packet_proc_states_t state;
-    packet_proc_event_t event;
+    packet_proc_event_t  event;
 } packet_proc_fsm_t;
 
 extern packet_proc_fsm_t packet_proc_handle;

@@ -13,6 +13,7 @@
 #include "led_animation.h"
 #include "host_comm_fsm.h"
 #include "packet_proc_fsm.h"
+#include "bootloader_fsm.h"
 #include "stdint.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -44,12 +45,14 @@ int main(void)
   led_bootloader_init();
   host_comm_fsm_init(&uart2);
   packet_proc_fsm_init(&packet_proc_handle);
-
+  boot_fsm_init(&boot_handle);
+  
   while (1)
   {
     led_bootloader_run();
     host_comm_fsm_run();
     packet_proc_fsm_run(&packet_proc_handle);
+    boot_fsm_run(&boot_handle);
   }
 }
 

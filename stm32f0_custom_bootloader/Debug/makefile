@@ -14,6 +14,7 @@ RM := rm -rf
 -include Core/Src/packet_proc/subdir.mk
 -include Core/Src/led_animation/subdir.mk
 -include Core/Src/host_comm/subdir.mk
+-include Core/Src/bootloader/subdir.mk
 -include Core/Src/API/subdir.mk
 -include Core/Src/subdir.mk
 -include subdir.mk

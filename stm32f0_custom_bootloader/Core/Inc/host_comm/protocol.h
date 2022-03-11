@@ -146,14 +146,12 @@ typedef union
 {
     struct
     {
-        uint32_t crc32;
-        uint16_t len_bytes;
-        uint16_t line_cnt;
+        uint16_t total_lines;
     }start_hex_flash;
 
     struct
     {
-        uint8_t line[MAX_PAYLOAD_SIZE];
+        uint8_t line_str[MAX_PAYLOAD_SIZE];
     }proc_hex_line;
 
 }h2t_payload_t;

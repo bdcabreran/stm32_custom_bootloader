@@ -3,6 +3,7 @@
 "./Core/Src/API/time_event.o"
 "./Core/Src/API/time_irq.o"
 "./Core/Src/API/uart_driver.o"
+"./Core/Src/bootloader/bootloader_fsm.o"
 "./Core/Src/host_comm/host_comm_fsm.o"
 "./Core/Src/host_comm/host_comm_rx_fsm.o"
 "./Core/Src/host_comm/host_comm_tx_fsm.o"

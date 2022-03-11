@@ -15,12 +15,9 @@
 #include <stdbool.h>
 #include <string.h>
 
-
 #define LED_ENDLESS_EXEC_TIME       (0xFFFFFFFF)
 #define LED_BRIGHT_REFRESH_RATE     (25)                        // time in milliseconds -> 40Hz
 #define LED_MAX_BRIGHTNESS          (LED_BRIGHT_REFRESH_RATE)   // [0 to LED_BRIGHT_REFRESH_RATE]
-
-
 
 typedef struct
 {

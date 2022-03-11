@@ -10,11 +10,11 @@
 
 #include "time_event.h"
 #include "protocol.h"
+#include "intel_hex_parser.h"
 
-#define COUTDOWN_TIMEOUT_MS (3000) 
-#define COUTDOWN_MSG_TIMEOUT_MS (200) //send countdown msg to host every 0.2s
-#define BOOT_TIMEOUT_MS     (1000*60) //safe exit in boot mode if no cmd is received 
-#define MAX_HEX_FRAME_LEN   (64)
+#define COUTDOWN_TIMEOUT_MS     (3000) 
+#define COUTDOWN_MSG_TIMEOUT_MS (200)       //send countdown msg to host every 0.2s
+#define BOOT_TIMEOUT_MS         (1000*60)   //safe exit in boot mode if no cmd is received 
 
 /*
  * Enum of states names in the statechart.
@@ -99,15 +99,31 @@ typedef struct
 
 typedef struct
 {
-    uint32_t crc32;
-    uint16_t len_bytes;
-    uint16_t line_cnt;
-    uint8_t line[MAX_HEX_FRAME_LEN];
-}hex_file_data_t;
+    uint16_t total_lines;
+    struct
+    {
+        uint16_t idx;
+        uint8_t  str[MAX_HEX_FRAME_LEN];
+        intel_hex_frame_t hex;
+    }line;
+}hex_file_info_t;
 
 typedef struct
 {
-    hex_file_data_t hex_file;
+    word_t   base_addr;
+    word_t   addr_offset;
+    uint32_t byte_cnt;
+    uint32_t app_crc32;    //accumulative crc32 of all data stored in flash
+}flash_ctrl_t;
+
+/**
+ * @brief 
+ * 
+ */
+typedef struct
+{
+    hex_file_info_t   hex_file;
+    flash_ctrl_t      flash;
 } boot_iface_t;
 
 /*! 

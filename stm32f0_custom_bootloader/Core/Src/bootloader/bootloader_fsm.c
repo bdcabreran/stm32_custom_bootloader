@@ -2,6 +2,7 @@
 #include "led_animation.h"
 #include "string.h"
 #include "host_comm_tx_fsm.h"
+#include "jump_function.h"
 
 /**@brief Enable/Disable debug messages */
 #define BOOT_DEBUG 0
@@ -24,6 +25,8 @@
 /**@ Extern handle for bootloader */
 boot_fsm_t boot_handle;
 
+
+/*STATE 2*/
 static bool boot_countdown_on_react(boot_fsm_t *handle);
 static bool boot_mode_on_react(boot_fsm_t *handle);
 static bool boot_jump_to_app_on_react(boot_fsm_t *handle);
@@ -39,6 +42,16 @@ static void enter_seq_boot_start_hex_flash(boot_fsm_t *handle);
 static void enter_seq_boot_write_hex_line(boot_fsm_t *handle);
 static void enter_seq_boot_finish_hex_flash(boot_fsm_t *handle);
 
+static uint8_t is_computed_app_integrity_ok(boot_fsm_t *handle);
+static void boot_save_integrity_status(boot_fsm_t *handle);
+static uint8_t process_hex_line(boot_fsm_t *handle);
+static uint8_t parse_hex_line(boot_fsm_t *handle);
+
+
+static void hex_record_data_handler(boot_fsm_t *handle);
+static void hex_record_end_of_file_handler(boot_fsm_t *handle);
+static void hex_record_extended_linear_addr_handler(boot_fsm_t *handle);
+
 
 static void boot_fsm_set_next_state(boot_fsm_t *handle, boot_states_t next_state)
 {
@@ -51,10 +64,13 @@ static void boot_fsm_set_next_state(boot_fsm_t *handle, boot_states_t next_state
 void boot_fsm_init(boot_fsm_t *handle)
 {
     /*Init Interface*/
-    handle->iface.hex_file.crc32 = 0;
-    handle->iface.hex_file.len_bytes = 0;
-    handle->iface.hex_file.line_cnt = 0;
-    memset((uint8_t *)&handle->iface.hex_file.line, 0, MAX_HEX_FRAME_LEN);
+    handle->iface.hex_file.total_lines = 0;
+    handle->iface.hex_file.line.idx = 0;
+    memset((uint8_t *)&handle->iface.hex_file.line.str, 0, MAX_HEX_FRAME_LEN);
+    handle->iface.flash.addr_offset.word = 0x00;
+    handle->iface.flash.base_addr.word = 0x00;
+    handle->iface.flash.app_crc32 = 0x00;
+    handle->iface.flash.byte_cnt = 0x00;
 
     /*Clear events*/
     time_event_stop(&handle->event.time.boot_timeout);
@@ -221,7 +237,7 @@ static bool boot_jump_to_app_on_react(boot_fsm_t *handle)
     if(ev->internal.name = ev_int_boot_integrity_ok)
     {
         /*Transition Action */
-        boot_jump_to_user_app();
+        boot_jump_to_user_app(handle);
 
         /*this line will never be reached*/
     }
@@ -236,21 +252,20 @@ static bool boot_jump_to_app_on_react(boot_fsm_t *handle)
 /*####################################################################################################################*/
 /*##### Jump to App state ############################################################################################*/
 /*####################################################################################################################*/
-static void entry_action_start_hex_flash(boot_fsm_t *handle)
-{
-    /*Clear previous user app in flash */
-    boot_clear_user_app();
-
-    /*Store expected crc, and hex lines to be processed */
-    handle->iface.app_len_bytes = 
-}
-
 static void enter_seq_boot_start_hex_flash(boot_fsm_t *handle)
 {
     boot_dbg("enter seq \t [ start hex flash ]\r\n");
     host_comm_rx_fsm_set_next_state(handle, st_boot_start_hex_flash);
     entry_action_start_hex_flash(handle);
 }
+
+static void entry_action_start_hex_flash(boot_fsm_t *handle)
+{
+    /*Clear previous user app in flash */
+    boot_clear_user_app(handle);
+    handle->iface.hex_file.line.idx = 0;
+}
+
 
 static bool boot_start_hex_flash_on_react(boot_fsm_t *handle)
 {
@@ -261,6 +276,12 @@ static bool boot_start_hex_flash_on_react(boot_fsm_t *handle)
 /*####################################################################################################################*/
 /*##### Finish Hex Flash State #######################################################################################*/
 /*####################################################################################################################*/
+static void enter_seq_boot_finish_hex_flash(boot_fsm_t *handle)
+{
+    boot_dbg("enter seq \t [ finish hex ]\r\n");
+    host_comm_rx_fsm_set_next_state(handle, st_boot_finish_hex_flash);
+    entry_action_finish_hex_flash(handle);
+}
 
 static void entry_action_finish_hex_flash(boot_fsm_t *handle)
 {
@@ -279,23 +300,16 @@ static void entry_action_finish_hex_flash(boot_fsm_t *handle)
     }
 }
 
-static void enter_seq_boot_finish_hex_flash(boot_fsm_t *handle)
-{
-    boot_dbg("enter seq \t [ finish hex ]\r\n");
-    host_comm_rx_fsm_set_next_state(handle, st_boot_finish_hex_flash);
-    entry_action_finish_hex_flash(handle);
-}
-
 static bool boot_finish_hex_flash_on_react(boot_fsm_t *handle)
 {
     boot_event_t *ev = &handle->event;
     if(ev->internal.name == ev_int_boot_hex_file_succeed)
     {
-        enter_seq_boot_mode(handle);
+        enter_seq_boot_jump_to_app(handle);
     }
     else if(ev->internal.name == ev_int_boot_hex_file_fail)
     {
-        enter_seq_boot_jump_to_app(handle);
+        enter_seq_boot_mode(handle);
     }
     return true;
 }
@@ -306,8 +320,8 @@ static bool boot_finish_hex_flash_on_react(boot_fsm_t *handle)
 
 static void entry_action_write_hex_line(boot_fsm_t *handle)
 {
-    /*write new line in flash */
-    if(process_hex_line())
+    /*write new line in flash */ 
+    if(process_hex_line(handle))
     {
         send_packet_np(T2H_RES_HEX_LINE_OK);
     }
@@ -348,15 +362,13 @@ uint8_t boot_fsm_set_ext_event(boot_fsm_t *handle, boot_external_event_t *event)
     case ev_ext_boot_finish_hex: break;
     case ev_ext_boot_start_hex:
     {
-        handle->iface.hex_file.crc32 = packet->payload.h2t.start_hex_flash.crc32;
-        handle->iface.hex_file.len_bytes = packet->payload.h2t.start_hex_flash.len_bytes;
-        handle->iface.hex_file.line_cnt = packet->payload.h2t.start_hex_flash.line_cnt;
+        handle->iface.hex_file.total_lines = packet->payload.h2t.start_hex_flash.total_lines;
     }
     break;
 
     case ev_ext_boot_proc_line:
     {
-        memcpy((uint8_t *)&handle->iface.hex_file.line, packet->payload.h2t.proc_hex_line.line,
+        memcpy((uint8_t *)&handle->iface.hex_file.line.str, packet->payload.h2t.proc_hex_line.line_str,
                packet->header.payload_len);
     }
     break;
@@ -398,7 +410,7 @@ static bool is_stored_app_integrity_ok(boot_fsm_t *handle)
     //     return false;
 }
 
-static void is_computed_app_integrity_ok(boot_fsm_t *handle)
+static uint8_t is_computed_app_integrity_ok(boot_fsm_t *handle)
 {
     // uint32_t app_crc = compute_app_crc(start_addr, data_len);
     // uint32_t exp_crc = handle->iface.exp_crc;
@@ -414,20 +426,158 @@ static void boot_save_integrity_status(boot_fsm_t *handle)
     /*store crc and data len */
 }
 
-static void boot_jump_to_user_app(void)
+static void boot_jump_to_user_app(boot_fsm_t *handle)
 {
+    if(!jump_to_user_app())
+    {
+        handle->event.internal.name = ev_int_boot_integrity_fail;
+    }
 
     return true;
 }
 
-static void boot_clear_user_app(void)
+static void boot_clear_user_app(boot_fsm_t *handle)
 {
     /*clear user app */
     
     /*erase crc32 and data len */
+    handle->iface.flash.addr_offset.word = 0x00;
+    handle->iface.flash.base_addr.word = 0x00;
+    handle->iface.flash.app_crc32 = 0x00;
 }
 
-static void process_hex_line(void)
+static uint8_t process_hex_line(boot_fsm_t *handle)
 {
+    /*Process hex line, update control data */
+    if(hex_line_str_to_intel_frame(handle->iface.hex_file.line.str, &handle->iface.hex_file.line.hex))
+    {
+        boot_dbg("\thex file ok\r\n");
+        parse_hex_line(handle);
+        return 1;
+    }
+    return 0;
+}
 
+static void hex_record_data_handler(boot_fsm_t *handle)
+{
+    intel_hex_frame_t *line_hex = &handle->iface.hex_file.line.hex;
+
+    handle->iface.flash.addr_offset.word = (line_hex->addr_offset);
+    uint32_t dest_flash_address = handle->iface.flash.base_addr.word + handle->iface.flash.addr_offset.word;
+    boot_dbg("write line -> addr offset : [0x%.8lX]\r\n", handle->iface.flash.addr_offset.word);
+
+    uint8_t data_len = line_hex->byte_count / sizeof(uint32_t);
+    handle->iface.flash.byte_cnt += line_hex->byte_count;
+    boot_dbg("write line -> dest addr : [0x%.8lX]\r\n", dest_flash_address);
+
+    HAL_FLASH_Unlock();
+    /* Write Bytes in flash */
+    for (size_t i = 0; i < data_len; i++)
+    {
+        boot_dbg("dest addr : [0x%.8lX] | data : [0x%.8lX]\r\n", dest_flash_address, line_hex->data[i].word);
+        flash_write_word(dest_flash_address, line_hex->data[i].word);
+        dest_flash_address += 4;
+    }
+    HAL_FLASH_Lock();
+
+    /* Update User App Flash CRC*/
+    sw_crc32_accumulate(&line_hex->data[0].word, data_len, &handle->iface.flash.app_crc32);
+
+    return 1;
+}
+
+static void hex_record_end_of_file_handler(boot_fsm_t *handle)
+{
+    /* check the CRC from flash */
+    uint32_t total_app_len = handle->iface.flash.base_addr.word + handle->iface.flash.byte_cnt;
+    boot_dbg("calculating crc from -> [0x%.8lX] to [0x%.8lX] \r\n",
+             (uint8_t *)FLASH_USER_APP_START_ADDR, handle->iface.flash.base_addr.word);
+
+    uint32_t crc32 = flash_get_crc32b((uint32_t)FLASH_USER_APP_START_ADDR, total_app_len);
+
+    if (handle->iface.flash.app_crc32 == crc32 )
+    {
+        boot_dbg("crc accumulated and calculated matched-> [0x%.8lX]\r\n", crc32);
+        uint32_t app_len = (handle->iface.flash.base_addr.word - FLASH_USER_APP_START_ADDR);
+        HAL_Delay(10);
+
+        __disable_irq();
+        /* Write CRC and App length to flash */
+        flash_clear_crc32_and_len_page();
+
+        HAL_FLASH_Unlock();
+        flash_write_word(FLASH_BL_CRC_ADDR, handle->iface.flash.app_crc32);
+        flash_write_word(FLASH_BL_DATA_LEN_ADDR, app_len);
+        HAL_FLASH_Lock();
+
+        __enable_irq();
+
+        boot_dbg("crc stored at [0x%.8lX] -> val [0x%.8lX]\r\n",
+                          (uint32_t *)FLASH_BL_CRC_ADDR, flash_read_user_app_crc());
+        boot_dbg("data len  stored at [0x%.8lX] -> val [0x%.8lX]\r\n",
+                          (uint32_t *)FLASH_BL_DATA_LEN_ADDR, flash_read_user_app_len());
+        return 1;
+    }
+    else 
+    {
+        boot_dbg("crc not match-> accumulated [0x%.8lX] != calculated [0x%.8lX]\r\n",
+                 handle->iface.flash.app_crc32, crc32);
+        flash_clear_crc32_and_len_page();
+    }
+
+    return 0;
+}
+
+static void hex_record_extended_linear_addr_handler(boot_fsm_t *handle)
+{
+    /* Get Flash Base addres MSB */
+    intel_hex_frame_t *line_hex = &handle->iface.hex_file.line.hex;
+    handle->iface.flash.base_addr.word = hex_line_endian_swap_32(line_hex->data[0].word);
+    handle->iface.flash.addr_offset.word = 0x00;
+    boot_dbg("hex file base flash addr [0x%lX]\r\n", handle->iface.flash.base_addr.word);
+    return 1;
+}
+
+
+static uint8_t parse_hex_line(boot_fsm_t *handle)
+{
+    hex_line_dbg("parsing hex frame ...\r\n");
+    record_type_t record_type = handle->iface.hex_file.line.hex.record_type;
+
+    switch (record_type)
+    {
+
+    case HEX_RECORD_DATA:
+    {
+        hex_line_dbg("data \r\n");
+        hex_record_data_handler(handle);
+    }
+    break;
+
+    case HEX_RECORD_END_OF_FILE:
+    {
+        hex_line_dbg("end of file\r\n");
+        hex_record_end_of_file_handler(handle);
+    }
+    break;
+
+    case HEX_RECORD_EXTENDED_LINEAR_ADDR:
+    {
+        hex_line_dbg("extended linear addr \r\n");
+        hex_record_extended_linear_addr_handler(handle);
+    }
+    break;
+
+    case HEX_RECORD_EXTENDED_SEG_ADDR:
+    case HEX_RECORD_START_SEG_ADDR:
+    case HEX_RECORD_START_LINEAR_ADDR:
+    {
+        boot_dbg("\t record type [0x%X] - not supported\r\n", record_type);
+    }
+    break;
+
+    default:
+        break;
+    }
+    return 1;
 }
